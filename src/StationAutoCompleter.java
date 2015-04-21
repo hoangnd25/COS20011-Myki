@@ -8,18 +8,20 @@ public class StationAutoCompleter extends AutoCompleter{
         super(comp);
     }
 
-    protected String[] getSuggestionForValue(String value){
-        List<String> result = new ArrayList<String>();
+    protected List getSuggestionForValue(String value){
+        List<Station> result = new ArrayList<Station>();
         List<Station> stations = DataLoader.getInstance().getStations();
         for (int i = 0; i < stations.size(); i++) {
             Station station = stations.get(i);
             if(station.getName().toLowerCase().startsWith(value.toLowerCase()))
-                result.add(station.getName());
+                result.add(station);
         }
-        return result.toArray(new String[0]);
+
+        return result;
     }
 
-    protected String formatSelectedValue(String value){
-        return value;
+    protected String formatSelectedValue(Object selected){
+        Station station = (Station)selected;
+        return station.getName();
     }
 }

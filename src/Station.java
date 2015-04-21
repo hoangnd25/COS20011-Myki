@@ -29,6 +29,10 @@ public class Station {
         return zone;
     }
 
+    public String getFormatedZone() {
+        return zone == 0 ? "Overlap" : String.format("Zone %d", zone);
+    }
+
     public void setZone(int zone) {
         this.zone = zone;
     }
@@ -39,5 +43,10 @@ public class Station {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", this.getName(), this.getFormatedZone() );
     }
 }

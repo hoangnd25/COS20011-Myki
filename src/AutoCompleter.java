@@ -3,6 +3,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 
 public abstract class AutoCompleter{
 
@@ -45,11 +46,11 @@ public abstract class AutoCompleter{
 
     private void showPopup(){
         popup.setVisible(false);
-        String[] suggestions = getSuggestionForValue(textComp.getText());
-        list.setListData(suggestions);
+        List suggestions = getSuggestionForValue(textComp.getText());
+        list.setListData(suggestions.toArray());
         int listSize = list.getModel().getSize();
 
-        if(textComp.isEnabled() && suggestions.length > 0 && listSize > 0){
+        if(textComp.isEnabled() && suggestions.size() > 0 && listSize > 0){
             textComp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "acceptAction");
             list.setVisibleRowCount(listSize < 10 ? listSize : 10);
             int x = 0;
@@ -79,7 +80,7 @@ public abstract class AutoCompleter{
     }
 
     protected void acceptItem(){
-        String selected = (String)list.getSelectedValue();
+        Object selected = list.getSelectedValue();
         if(selected == null)
             return;
 
@@ -153,7 +154,7 @@ public abstract class AutoCompleter{
         });
     }
 
-    protected abstract String[] getSuggestionForValue(String value);
+    protected abstract List getSuggestionForValue(String value);
 
-    protected abstract String formatSelectedValue(String value);
+    protected abstract String formatSelectedValue(Object value);
 }
