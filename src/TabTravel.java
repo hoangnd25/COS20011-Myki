@@ -1,5 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class TabTravel extends JPanel{
 
@@ -12,6 +15,15 @@ public class TabTravel extends JPanel{
         SpringLayout layout = new SpringLayout();
         this.setLayout(layout);
 
+        JLabel lblDateTouchOn = new JLabel("Touch on time");
+        JTextField txtDateTouchOn =  new JTextField(6);
+        txtDateTouchOn.setText(getDateFormat().format(getTimeNow()));
+        JTextField txtTimeTouchOn =  new JTextField(4);
+        txtTimeTouchOn.setText(getTimeFormat().format(getTimeNow()));
+        this.add(lblDateTouchOn);
+        this.add(txtDateTouchOn);
+        this.add(txtTimeTouchOn);
+
         JLabel lblStationOn = new JLabel("Touch on station");
         this.add(lblStationOn);
 
@@ -21,6 +33,15 @@ public class TabTravel extends JPanel{
 
         JButton btnTouchOn = new JButton("Touch on");
         this.add(btnTouchOn);
+
+        JLabel lblDateTouchOff = new JLabel("Touch off time");
+        JTextField txtDateTouchOff =  new JTextField(6);
+        txtDateTouchOff.setText(getDateFormat().format(getTimeNow()));
+        JTextField txtTimeTouchOff =  new JTextField(4);
+        txtTimeTouchOff.setText(getTimeFormat().format(getTimeNow()));
+        this.add(lblDateTouchOff);
+        this.add(txtDateTouchOff);
+        this.add(txtTimeTouchOff);
 
         JLabel lblStationOff = new JLabel("Touch off station");
         this.add(lblStationOff);
@@ -48,7 +69,15 @@ public class TabTravel extends JPanel{
         this.add(scrollPane);
 
         //Set layout for touch on
-        layout.putConstraint(SpringLayout.NORTH, txtStationOn, 2*MARGIN_TOP, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, lblDateTouchOn, MARGIN_TOP, SpringLayout.NORTH, this);
+        layout.putConstraint(SpringLayout.NORTH, txtDateTouchOn, 0, SpringLayout.SOUTH, lblDateTouchOn);
+        layout.putConstraint(SpringLayout.NORTH, txtTimeTouchOn, 0, SpringLayout.SOUTH, lblDateTouchOn);
+
+        layout.putConstraint(SpringLayout.WEST, lblDateTouchOn, MARGIN_LEFT, SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.WEST, txtDateTouchOn, 0, SpringLayout.WEST, lblDateTouchOn);
+        layout.putConstraint(SpringLayout.WEST, txtTimeTouchOn, 0, SpringLayout.EAST, txtDateTouchOn);
+
+        layout.putConstraint(SpringLayout.NORTH, txtStationOn, MARGIN_TOP, SpringLayout.SOUTH, txtDateTouchOn);
         layout.putConstraint(SpringLayout.WEST, txtStationOn, MARGIN_LEFT, SpringLayout.WEST, this);
         layout.putConstraint(SpringLayout.EAST, txtStationOn, MARGIN_RIGHT, SpringLayout.WEST, btnTouchOn);
 
@@ -60,7 +89,15 @@ public class TabTravel extends JPanel{
 
 
         //Set layout for touch off
-        layout.putConstraint(SpringLayout.NORTH, txtStationOff, 4*MARGIN_TOP, SpringLayout.SOUTH, txtStationOn);
+        layout.putConstraint(SpringLayout.NORTH, lblDateTouchOff, 2*MARGIN_TOP, SpringLayout.SOUTH, txtStationOn);
+        layout.putConstraint(SpringLayout.NORTH, txtDateTouchOff, 0, SpringLayout.SOUTH, lblDateTouchOff);
+        layout.putConstraint(SpringLayout.NORTH, txtTimeTouchOff, 0, SpringLayout.SOUTH, lblDateTouchOff);
+
+        layout.putConstraint(SpringLayout.WEST, lblDateTouchOff, MARGIN_LEFT, SpringLayout.WEST, this);
+        layout.putConstraint(SpringLayout.WEST, txtDateTouchOff, 0, SpringLayout.WEST, lblDateTouchOff);
+        layout.putConstraint(SpringLayout.WEST, txtTimeTouchOff, 0, SpringLayout.EAST, txtDateTouchOff);
+
+        layout.putConstraint(SpringLayout.NORTH, txtStationOff, MARGIN_TOP, SpringLayout.SOUTH, txtDateTouchOff);
         layout.putConstraint(SpringLayout.WEST, txtStationOff, MARGIN_LEFT, SpringLayout.WEST, this);
         layout.putConstraint(SpringLayout.EAST, txtStationOff, MARGIN_RIGHT, SpringLayout.WEST, btnTouchOff);
 
@@ -94,5 +131,17 @@ public class TabTravel extends JPanel{
         label.setForeground(ERROR_COLOR);
         label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
         return label;
+    }
+
+    protected SimpleDateFormat getDateFormat(){
+        return new SimpleDateFormat("dd/MM/yy");
+    }
+
+    protected SimpleDateFormat getTimeFormat(){
+        return new SimpleDateFormat("HH:mm");
+    }
+
+    protected Date getTimeNow(){
+        return Calendar.getInstance().getTime();
     }
 }
