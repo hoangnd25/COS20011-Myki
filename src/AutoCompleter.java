@@ -68,7 +68,7 @@ public abstract class AutoCompleter{
         textComp.requestFocus();
     }
 
-    protected void selectItem(int value){
+    private void selectItem(int value){
         int potentialIndex = list.getSelectedIndex() + value;
 
         if(potentialIndex < 0 || potentialIndex > (list.getModel().getSize() - 1)){
@@ -79,7 +79,7 @@ public abstract class AutoCompleter{
         }
     }
 
-    protected void acceptItem(){
+    private void acceptItem(){
         Object selected = list.getSelectedValue();
         if(selected == null)
             return;

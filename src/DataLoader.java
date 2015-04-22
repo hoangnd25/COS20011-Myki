@@ -6,13 +6,13 @@ import java.util.List;
 public class DataLoader {
 
     private static DataLoader instance = null;
-    protected List<Station> stations;
-    protected List<TrainLine> lines;
+    private List<Station> stations;
+    private List<TrainLine> lines;
 
-    protected static String FILE_STATION = "stations.txt";
-    protected static String FILE_TRAINLINE = "lines.txt";
+    private static String FILE_STATION = "stations.txt";
+    private static String FILE_TRAINLINE = "lines.txt";
 
-    protected DataLoader() {
+    private DataLoader() {
         stations = new ArrayList<Station>();
         lines = new ArrayList<TrainLine>();
     }
@@ -107,7 +107,7 @@ public class DataLoader {
         createLineDataFile();
     }
 
-    protected void createStationDataFile(){
+    private void createStationDataFile(){
         String[] stations = {
             "1,Parliament Station,1",
             "2,Melbourne Central Station,1",
@@ -167,7 +167,7 @@ public class DataLoader {
         }
     }
 
-    protected void createLineDataFile(){
+    private void createLineDataFile(){
         String[] lines = {
             "Belgrave Line,1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32",
             "Glen Waverley line,1 2 3 4 5 6 7 8 33 34 35 36 37 38 39 40 41 42 43"

@@ -2,11 +2,11 @@ import java.util.Date;
 
 public class TravelLog {
 
-    protected Date touchOnTime;
-    protected Date touchOffTime;
-    protected Station touchOnStation;
-    protected Station touchOffStation;
-    protected float fee;
+    private Date touchOnTime;
+    private Date touchOffTime;
+    private Station touchOnStation;
+    private Station touchOffStation;
+    private float fee;
 
     public TravelLog(Date touchOnTime, Date touchOffTime, Station touchOnStation, Station touchOffStation) {
         this.touchOnTime = touchOnTime;

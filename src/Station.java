@@ -4,9 +4,9 @@ public class Station {
     public static int ZONE2 = 2;
     public static int OVERLAP = 0;
 
-    protected int zone;
-    protected int id;
-    protected String name;
+    private int zone;
+    private int id;
+    private String name;
 
     public Station() {
     }

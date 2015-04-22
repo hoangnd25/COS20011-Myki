@@ -2,8 +2,8 @@ import java.util.List;
 
 public class TrainLine {
 
-    protected List<Station> stations;
-    protected String name;
+    private List<Station> stations;
+    private String name;
 
     public TrainLine(String name, List<Station> stations) {
         this.name = name;

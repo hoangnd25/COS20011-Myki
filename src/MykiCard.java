@@ -2,17 +2,17 @@ import java.util.*;
 
 public class MykiCard {
 
-    protected int id;
-    protected float balance;
-    protected List<TravelLog> travelLogs;
-    protected List<TopUpLog> topUpLogs;
-    protected Ticket ticket;
+    private int id;
+    private double balance;
+    private List<TravelLog> travelLogs;
+    private List<TopUpLog> topUpLogs;
+    private Ticket ticket;
 
     public MykiCard(int id) {
         this(id, 0);
     }
 
-    public MykiCard(int id, float balance) {
+    public MykiCard(int id, double balance) {
         this.id = id;
         this.balance = balance;
         this.ticket = null;
@@ -35,14 +35,14 @@ public class MykiCard {
         }
     }
 
-    public void topUp(float amount){
+    public void topUp(double amount){
         TopUpLog log = new TopUpLog(amount);
         this.balance += amount;
         this.topUpLogs.add(log);
     }
 
-    protected void charge(float amount, Date time){
-        float amountPaidToday = 0;
+    private void charge(double amount, Date time){
+        double amountPaidToday = 0;
 
         Calendar now = Calendar.getInstance();
         now.setTime(time);
@@ -58,7 +58,7 @@ public class MykiCard {
         for (int i = 0; i < this.travelLogs.size(); i++) {
             TravelLog log = this.travelLogs.get(i);
             if(log.getTouchOnTime().compareTo(todayAt3) >= 0){
-                amountPaidToday += log.fee;
+                amountPaidToday += log.getFee();
             }
         }
 
@@ -75,11 +75,11 @@ public class MykiCard {
         this.id = id;
     }
 
-    public float getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -88,6 +88,7 @@ public class MykiCard {
     }
 
     public List<TopUpLog> getTopUpLogs() {
+        Collections.sort(topUpLogs);
         return topUpLogs;
     }
 

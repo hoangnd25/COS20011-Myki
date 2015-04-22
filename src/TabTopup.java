@@ -1,5 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class TabTopup extends JPanel{
 
@@ -11,6 +16,12 @@ public class TabTopup extends JPanel{
     final int ROW_SPACE = 20;
     final Color ERROR_COLOR = Color.red;
 
+    JLabel lblBalanceNumber, lblMessage,
+           errExpireDate, errCardNumber, errHolderName, errAddress, errAmount
+    ;
+    JTextField txtCardNumber, txtHolderName, txtExpireDate, txtAddress, txtAmount;
+    JList lstTopupHistory;
+
     public TabTopup()
     {
         SpringLayout layout = new SpringLayout();
@@ -18,61 +29,67 @@ public class TabTopup extends JPanel{
 
         JLabel lblBalance = new JLabel("Balance:");
         this.add(lblBalance);
-        JLabel lblBalanceNumber = new JLabel("$0");
+        lblBalanceNumber = new JLabel();
         lblBalanceNumber.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
         this.add(lblBalanceNumber);
 
 
         JLabel lblCardNumber = new JLabel("Card number:");
         this.add(lblCardNumber);
-        JTextField txtCardNumber =  new JTextField(20);
+        txtCardNumber =  new JTextField(20);
         this.add(txtCardNumber);
 
         JLabel lblHolderName = new JLabel("Holder name:");
         this.add(lblHolderName);
-        JTextField txtHolderName =  new JTextField(20);
+        txtHolderName =  new JTextField(20);
         this.add(txtHolderName);
 
         JLabel lblExpireDate = new JLabel("Expiration date:");
         this.add(lblExpireDate);
-        JTextField txtExpireDate =  new JTextField(20);
+        txtExpireDate =  new JTextField(20);
         this.add(txtExpireDate);
 
         JLabel lblAddress = new JLabel("Billing address:");
         this.add(lblAddress);
-        JTextField txtAddress =  new JTextField(20);
+        txtAddress =  new JTextField(20);
         this.add(txtAddress);
 
         JLabel lblAmount = new JLabel("Amount:");
         this.add(lblAmount);
-        JTextField txtAmount =  new JTextField(20);
+        txtAmount =  new JTextField(20);
         this.add(txtAmount);
 
         JButton btnTopUp = new JButton("Top Up");
+        btnTopUp.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                topUp();
+            }
+        });
         this.add(btnTopUp);
 
-        JLabel errCardNumber = CreateErrorLabel();
+        errCardNumber = CreateErrorLabel();
         this.add(errCardNumber);
 
-        JLabel errHolderName = CreateErrorLabel();
+        errHolderName = CreateErrorLabel();
         this.add(errHolderName);
 
-        JLabel errExpireDate = CreateErrorLabel();
+        errExpireDate = CreateErrorLabel();
         this.add(errExpireDate);
 
-        JLabel errAddress = CreateErrorLabel();
+        errAddress = CreateErrorLabel();
         this.add(errAddress);
 
-        JLabel errAmount = CreateErrorLabel();
+        errAmount = CreateErrorLabel();
         this.add(errAmount);
 
-        JLabel lblMessage = new JLabel("");
+        lblMessage = new JLabel("");
         this.add(lblMessage);
 
         JLabel lblTopupHistory = new JLabel("Top Up History");
         this.add(lblTopupHistory);
 
-        JList lstTopupHistory = new JList();
+        lstTopupHistory = new JList();
         JScrollPane scrollPane = new JScrollPane(lstTopupHistory);
         scrollPane.setViewportView(lstTopupHistory);
         lstTopupHistory.setBackground(Color.white);
@@ -137,7 +154,7 @@ public class TabTopup extends JPanel{
 
 
         layout.putConstraint(SpringLayout.BASELINE, lblMessage, 0, SpringLayout.BASELINE, btnTopUp);
-        layout.putConstraint(SpringLayout.EAST, lblMessage, 0, SpringLayout.WEST, btnTopUp);
+        layout.putConstraint(SpringLayout.EAST, lblMessage, MARGIN_RIGHT/2 , SpringLayout.WEST, btnTopUp);
 
         layout.putConstraint(SpringLayout.NORTH, scrollPane, (int)Math.round(ROW_SPACE *1.5), SpringLayout.SOUTH, btnTopUp);
         layout.putConstraint(SpringLayout.SOUTH, scrollPane, MARGIN_BOTTOM , SpringLayout.SOUTH, this);
@@ -154,5 +171,91 @@ public class TabTopup extends JPanel{
         label.setForeground(ERROR_COLOR);
         label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 10));
         return label;
+    }
+
+    private void topUp(){
+        if(checkCreditCardInput()){
+            Application.getInstance().getMykiCard().topUp(getTopUpAmount());
+            updateData();
+            lblMessage.setText("Your top up is successful");
+        }else{
+            lblMessage.setText("Please retype your credit information & amount");
+        }
+    }
+
+    private boolean checkCreditCardInput(){
+        clearError();
+        boolean isInputValid = true;
+
+        if(txtHolderName.getText().trim().equals("")){
+            errHolderName.setText("Account name should not be empty or only whitespaces");
+            isInputValid = false;
+        }
+
+        if(txtAddress.getText().trim().equals("")){
+            errAddress.setText("Billing address should not be empty or only whitespaces");
+            isInputValid = false;
+        }
+
+        int cardNumber = -1;
+        try{
+            cardNumber = Integer.parseInt(txtCardNumber.getText());
+        }catch (Exception ex){
+            errCardNumber.setText("Card number should be positive number");
+            isInputValid = false;
+        }
+        if(cardNumber < 0) {
+            errCardNumber.setText("Card number should be positive number");
+            isInputValid = false;
+        }
+
+        int expireDate = -1;
+        try{
+            expireDate = Integer.parseInt(txtExpireDate.getText());
+        }catch (Exception ex){
+            errExpireDate.setText("Expiration date should be positive number");
+            isInputValid = false;
+        }
+        if(expireDate < 0){
+            errExpireDate.setText("Expiration date should be positive number");
+            isInputValid = false;
+        }
+
+        if(getTopUpAmount() < 0){
+            errAmount.setText("Top up amount should be greater than 0");
+            isInputValid = false;
+        }
+
+        return isInputValid;
+    }
+
+    private double getTopUpAmount(){
+        try{
+            return Double.parseDouble(txtAmount.getText());
+        }catch (Exception ex){
+            return -1;
+        }
+    }
+
+    private void clearError(){
+        errHolderName.setText("");
+        errCardNumber.setText("");
+        errAddress.setText("");
+        errAmount.setText("");
+        errExpireDate.setText("");
+        lblMessage.setText("");
+    }
+
+    public void updateData(){
+        MykiCard mykiCard = Application.getInstance().getMykiCard();
+        NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
+
+        lblBalanceNumber.setText(numberFormatter.format(mykiCard.getBalance()));
+
+        java.util.List listData = new ArrayList<String>();
+        for(TopUpLog log : mykiCard.getTopUpLogs()){
+            listData.add(log);
+        }
+        lstTopupHistory.setListData(listData.toArray());
     }
 }

@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -10,6 +12,9 @@ public class TabTravel extends JPanel{
     final int MARGIN_LEFT = 20;
     final int MARGIN_RIGHT = -MARGIN_LEFT;
     final Color ERROR_COLOR = Color.red;
+
+    JLabel errTouchOn;
+    JLabel errTouchOff;
 
     public TabTravel(){
         SpringLayout layout = new SpringLayout();
@@ -32,6 +37,11 @@ public class TabTravel extends JPanel{
         this.add(txtStationOn);
 
         JButton btnTouchOn = new JButton("Touch on");
+        btnTouchOn.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                touchOn();
+            }
+        });
         this.add(btnTouchOn);
 
         JLabel lblDateTouchOff = new JLabel("Touch off time");
@@ -53,10 +63,10 @@ public class TabTravel extends JPanel{
         JButton btnTouchOff = new JButton("Touch off");
         this.add(btnTouchOff);
 
-        JLabel errTouchOn = CreateErrorLabel();
+        errTouchOn = CreateErrorLabel();
         this.add(errTouchOn);
 
-        JLabel errTouchOff = CreateErrorLabel();
+        errTouchOff = CreateErrorLabel();
         this.add(errTouchOff);
 
         JLabel lblTravelHistory = new JLabel("Travel History");
@@ -133,15 +143,20 @@ public class TabTravel extends JPanel{
         return label;
     }
 
-    protected SimpleDateFormat getDateFormat(){
+    private void touchOn(){
+        if(Application.getInstance().getMykiCard().getBalance() < 10)
+            errTouchOn.setText("Your Myki card balance is less than $10. Please recharge before using it");
+    }
+
+    private SimpleDateFormat getDateFormat(){
         return new SimpleDateFormat("dd/MM/yy");
     }
 
-    protected SimpleDateFormat getTimeFormat(){
+    private SimpleDateFormat getTimeFormat(){
         return new SimpleDateFormat("HH:mm");
     }
 
-    protected Date getTimeNow(){
+    private Date getTimeNow(){
         return Calendar.getInstance().getTime();
     }
 }
