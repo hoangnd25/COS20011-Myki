@@ -21,6 +21,7 @@ public class TabTravel extends JPanel{
     JLabel errTouchOn, errTouchOff;
     JTextField txtDateTouchOn, txtTimeTouchOn, txtStationOn,
                txtDateTouchOff, txtTimeTouchOff, txtStationOff;
+    JList lstTravelHistory;
 
     public TabTravel(){
         SpringLayout layout = new SpringLayout();
@@ -82,7 +83,7 @@ public class TabTravel extends JPanel{
 
         JLabel lblTravelHistory = new JLabel("Travel History");
         this.add(lblTravelHistory);
-        JList lstTravelHistory = new JList();
+        lstTravelHistory = new JList();
         JScrollPane scrollPane = new JScrollPane(lstTravelHistory);
         scrollPane.setViewportView(lstTravelHistory);
         lstTravelHistory.setBackground(Color.white);
@@ -157,12 +158,16 @@ public class TabTravel extends JPanel{
     private void touchOn(){
         if(checkTouchOnInput()){
             Station station = getStation(txtStationOn.getText());
+            Application.getInstance().getMykiCard().touchOn(getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText()), station);
+            updateData();
         }
     }
 
     private void touchOff(){
         if(checkTouchOffInput()){
             Station station = getStation(txtStationOff.getText());
+            Application.getInstance().getMykiCard().touchOff(getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText()), station);
+            updateData();
         }
     }
 
@@ -238,13 +243,11 @@ public class TabTravel extends JPanel{
         MykiCard mykiCard = Application.getInstance().getMykiCard();
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
-//        lblBalanceNumber.setText(numberFormatter.format(mykiCard.getBalance()));
-
-//        java.util.List listData = new ArrayList<String>();
-//        for(TopUpLog log : mykiCard.getTopUpLogs()){
-//            listData.add(log);
-//        }
-//        lstTopupHistory.setListData(listData.toArray());
+        java.util.List listData = new ArrayList<String>();
+        for(TravelLog log : mykiCard.getTravelLogs()){
+            listData.add(log.toString());
+        }
+        lstTravelHistory.setListData(listData.toArray());
     }
 
     private SimpleDateFormat getDateFormat(){

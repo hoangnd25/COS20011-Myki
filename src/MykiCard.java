@@ -6,7 +6,6 @@ public class MykiCard {
     private double balance;
     private List<TravelLog> travelLogs;
     private List<TopUpLog> topUpLogs;
-    private Ticket ticket;
 
     public MykiCard(int id) {
         this(id, 0);
@@ -15,7 +14,6 @@ public class MykiCard {
     public MykiCard(int id, double balance) {
         this.id = id;
         this.balance = balance;
-        this.ticket = null;
         travelLogs = new ArrayList<TravelLog>();
         topUpLogs = new ArrayList<TopUpLog>();
     }
@@ -23,6 +21,7 @@ public class MykiCard {
     public void touchOn(Date time, Station station){
         touchOff(time, station);
         TravelLog log = new TravelLog(time, null, station, null);
+        travelLogs.add(log);
     }
 
     public void touchOff(Date time, Station station){
@@ -42,29 +41,34 @@ public class MykiCard {
     }
 
     private void charge(double amount, Date time){
-        double amountPaidToday = 0;
+        double amountPaid = getAmountPaidForTheDay(time);
+        if(amount > amountPaid){
+            this.balance -= (amount - amountPaid);
+        }
+    }
 
-        Calendar now = Calendar.getInstance();
-        now.setTime(time);
-        now.set(Calendar.HOUR_OF_DAY, 3);
-        now.set(Calendar.MINUTE, 0);
-        now.set(Calendar.SECOND, 0);
-        now.set(Calendar.MILLISECOND, 0);
-        Date todayAt3 = now.getTime();
+    private List<TravelLog> getTravelLogsForTheDay(Date time){
+        List<TravelLog> logs = new ArrayList<TravelLog>();
 
-//        now.set(Calendar.DATE, now.get(Calendar.DATE) + 1);
-//        Date tomorrowAt3 = now.getTime();
+        Date todayAt3 = DateUtils.getTimeAt3(time);
+        Date tomorrowAt3 = DateUtils.getTimeTomorrowAt3(time);
 
         for (int i = 0; i < this.travelLogs.size(); i++) {
             TravelLog log = this.travelLogs.get(i);
-            if(log.getTouchOnTime().compareTo(todayAt3) >= 0){
-                amountPaidToday += log.getFee();
+            if(log.getTouchOnTime().compareTo(todayAt3) >= 0 && log.getTouchOnTime().compareTo(tomorrowAt3) < 0){
+                logs.add(log);
             }
         }
 
-        if(amount > amountPaidToday){
-            this.balance -= (amount - amountPaidToday);
+        return logs;
+    }
+
+    private double getAmountPaidForTheDay(Date time){
+        double amountPaidToday = 0;
+        for(TravelLog log : getTravelLogsForTheDay(time)){
+            amountPaidToday += log.getFee();
         }
+        return amountPaidToday;
     }
 
     public int getId() {
@@ -84,19 +88,12 @@ public class MykiCard {
     }
 
     public List<TravelLog> getTravelLogs() {
+        Collections.sort(travelLogs);
         return travelLogs;
     }
 
     public List<TopUpLog> getTopUpLogs() {
         Collections.sort(topUpLogs);
         return topUpLogs;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
-    }
-
-    public void setTicket(Ticket ticket) {
-        this.ticket = ticket;
     }
 }

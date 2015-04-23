@@ -1,22 +1,11 @@
-public class TicketDaily extends TicketTwoHours {
-
-    public TicketDaily(){}
-
-    public TicketDaily(TicketTwoHours ticket){
-        this.expireAt = ticket.expireAt;
+public class TicketDaily {
+    public static float getZone1Fare() {
+        return TicketTwoHours.getZone1Fare() * 2;
     }
-
-    public String getType() {
-        return Ticket.DAILY;
+    public static float getZone2Fare() {
+        return TicketTwoHours.getZone2Fare() * 2;
     }
-
-    @Override
-    public float getZone1Fare() {
-        return super.getZone1Fare() * 2;
-    }
-
-    @Override
-    public float getZone2Fare() {
-        return super.getZone2Fare() * 2;
+    public static float getZone1And2Fare() {
+        return getZone1Fare();
     }
 }
