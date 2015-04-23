@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.*;
 
 public class Application {
     private MykiCard mykiCard;
@@ -22,6 +23,7 @@ public class Application {
     public void run(){
         JFrame frame = this.createGUI();
         frame.setVisible(true);
+        DataLoader.getInstance().setUpStationData();
         setUpMyki();
         updateData();
     }

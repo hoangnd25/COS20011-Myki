@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrainLine {
@@ -5,9 +6,9 @@ public class TrainLine {
     private List<Station> stations;
     private String name;
 
-    public TrainLine(String name, List<Station> stations) {
+    public TrainLine(String name) {
         this.name = name;
-        this.stations = stations;
+        this.stations = new ArrayList<Station>();
     }
 
     public String getName() {
@@ -32,5 +33,9 @@ public class TrainLine {
             }
         }
         return null;
+    }
+
+    public List<Station> getStations() {
+        return stations;
     }
 }

@@ -1,4 +1,3 @@
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,37 +23,9 @@ public class DataLoader {
         return instance;
     }
 
-    public List<Station> getStations(){
-        if(stations.size() == 0){
-            File file = new File(DataLoader.FILE_STATION);
-            if(!(file.exists() && !file.isDirectory())) {
-                createStationDataFile();
-            }
-
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(file));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] data = line.split(",");
-
-                    Station station = new Station(Integer.parseInt(data[0]), data[1], Integer.parseInt(data[2]));
-                    stations.add(station);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if(reader != null)
-                        reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return stations;
+    public void setUpStationData(){
+        loadStations();
+        loadTrainLines();
     }
 
     public Station getStation(String name){
@@ -65,49 +36,91 @@ public class DataLoader {
         return null;
     }
 
+    public List<Station> getStations(){
+        if(stations.size() == 0){
+
+        }
+        return stations;
+    }
+
     public List<TrainLine> getTrainLines(){
         if(lines.size() == 0){
-            File file = new File(DataLoader.FILE_TRAINLINE);
-            if(!(file.exists() && !file.isDirectory())) {
-                createLineDataFile();
-            }
-
-            if(this.stations.size() == 0)
-                this.getStations();
-
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new FileReader(file));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] data = line.split(",");
-                    String[] stationIds = data[1].split(" ");
-                    List<Station> stations = new ArrayList<Station>();
-
-                    for (int i = 0; i < stationIds.length; i++) {
-                        for (int j = 0; j < this.stations.size(); j++) {
-                            if(Integer.parseInt(stationIds[i]) == this.stations.get(j).getId())
-                            stations.add(this.stations.get(j));
-                        }
-                    }
-
-                    TrainLine trainLine = new TrainLine(data[0], stations);
-                    lines.add(trainLine);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if(reader != null)
-                        reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            loadTrainLines();
         }
 
         return lines;
+    }
+
+    private void loadStations(){
+        File file = new File(DataLoader.FILE_STATION);
+        if(!(file.exists() && !file.isDirectory())) {
+            createStationDataFile();
+        }
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+
+                Station station = new Station(Integer.parseInt(data[0]), data[1], Integer.parseInt(data[2]));
+                stations.add(station);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void loadTrainLines(){
+        File file = new File(DataLoader.FILE_TRAINLINE);
+        if(!(file.exists() && !file.isDirectory())) {
+            createLineDataFile();
+        }
+
+        if(this.stations.size() == 0)
+            this.loadStations();
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                String[] stationIds = data[1].split(" ");
+
+                TrainLine trainLine = new TrainLine(data[0]);
+
+                for (int i = 0; i < stationIds.length; i++) {
+                    for (int j = 0; j < this.stations.size(); j++) {
+                        Station station = this.stations.get(j);
+                        if(Integer.parseInt(stationIds[i]) == station.getId()){
+                            trainLine.getStations().add(station);
+                            station.getTrainLines().add(trainLine);
+                        }
+                    }
+                }
+                lines.add(trainLine);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void createDataFiles(){

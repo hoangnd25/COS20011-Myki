@@ -30,6 +30,48 @@ public class MykiCard {
             if(log.getTouchOffTime() == null && log.getTouchOffStation() == null){
                 log.setTouchOffTime(time);
                 log.setTouchOffStation(station);
+
+                List<TrainLine> intersectLines = new ArrayList<TrainLine>(log.getTouchOffStation().getTrainLines());
+                intersectLines.retainAll(log.getTouchOnStation().getTrainLines());
+
+                boolean isTravellingZone1 = false;
+                boolean isTravellingZone2 = false;
+
+                int touchOnZone = log.getTouchOnStation().getZone();
+                int touchOffZone = log.getTouchOffStation().getZone();
+
+                if(touchOnZone == touchOffZone){
+                    if(touchOnZone == Station.ZONE1){
+                        isTravellingZone1 = true;
+                        isTravellingZone2 = false;
+
+                        if(intersectLines.isEmpty())
+                            isTravellingZone2 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE2);
+                    }else{
+                        isTravellingZone1 = false;
+                        isTravellingZone2 = true;
+
+                        if(intersectLines.isEmpty())
+                            isTravellingZone1 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE1);
+                    }
+                }else{
+                    if(touchOnZone == Station.OVERLAP || touchOffZone == Station.OVERLAP){
+                        int sum = touchOnZone + touchOffZone;
+                        if(sum == Station.ZONE1){
+                            isTravellingZone1 = true;
+                            isTravellingZone2 = false;
+                        }else{
+                            isTravellingZone1 = false;
+                            isTravellingZone2 = true;
+                        }
+                    }else{
+                        isTravellingZone1 = true;
+                        isTravellingZone2 = true;
+                    }
+                }
+
+                //
+
             }
         }
     }
@@ -69,6 +111,20 @@ public class MykiCard {
             amountPaidToday += log.getFee();
         }
         return amountPaidToday;
+    }
+
+    private boolean isTransitStationInZone(Station s1, Station s2, int zone){
+        List<Station> s1LineStations = s1.getTrainLines().get(0).getStations();
+        List<Station> s2LineStations = s2.getTrainLines().get(0).getStations();
+
+        List<Station> intersect = new ArrayList<Station>(s1LineStations);
+        intersect.retainAll(s2LineStations);
+
+        for(Station station: intersect){
+            if(station.getZone() == zone)
+                return true;
+        }
+        return false;
     }
 
     public int getId() {

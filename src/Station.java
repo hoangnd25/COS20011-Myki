@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Station {
 
     public static int ZONE1 = 1;
@@ -7,6 +10,7 @@ public class Station {
     private int zone;
     private int id;
     private String name;
+    private List<TrainLine> lines;
 
     public Station() {
     }
@@ -15,6 +19,11 @@ public class Station {
         this.zone = zone;
         this.id = id;
         this.name = name;
+        this.lines = new ArrayList<TrainLine>();
+    }
+
+    public List<TrainLine> getTrainLines() {
+        return lines;
     }
 
     public String getName() {
