@@ -57,6 +57,14 @@ public class DataLoader {
         return stations;
     }
 
+    public Station getStation(String name){
+        for(Station station : getStations()){
+            if(station.getName().equals(name))
+                return station;
+        }
+        return null;
+    }
+
     public List<TrainLine> getTrainLines(){
         if(lines.size() == 0){
             File file = new File(DataLoader.FILE_TRAINLINE);

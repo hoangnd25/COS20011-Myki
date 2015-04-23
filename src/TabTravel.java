@@ -2,9 +2,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class TabTravel extends JPanel{
 
@@ -12,18 +15,21 @@ public class TabTravel extends JPanel{
     final int MARGIN_LEFT = 20;
     final int MARGIN_RIGHT = -MARGIN_LEFT;
     final Color ERROR_COLOR = Color.red;
+    final String DATE_FORMAT = "dd/MM/yy";
+    final String TIME_FORMAT = "HH:mm";
 
-    JLabel errTouchOn;
-    JLabel errTouchOff;
+    JLabel errTouchOn, errTouchOff;
+    JTextField txtDateTouchOn, txtTimeTouchOn, txtStationOn,
+               txtDateTouchOff, txtTimeTouchOff, txtStationOff;
 
     public TabTravel(){
         SpringLayout layout = new SpringLayout();
         this.setLayout(layout);
 
         JLabel lblDateTouchOn = new JLabel("Touch on time");
-        JTextField txtDateTouchOn =  new JTextField(6);
+        txtDateTouchOn =  new JTextField(6);
         txtDateTouchOn.setText(getDateFormat().format(getTimeNow()));
-        JTextField txtTimeTouchOn =  new JTextField(4);
+        txtTimeTouchOn =  new JTextField(4);
         txtTimeTouchOn.setText(getTimeFormat().format(getTimeNow()));
         this.add(lblDateTouchOn);
         this.add(txtDateTouchOn);
@@ -32,7 +38,7 @@ public class TabTravel extends JPanel{
         JLabel lblStationOn = new JLabel("Touch on station");
         this.add(lblStationOn);
 
-        JTextField txtStationOn =  new JTextField(20);
+        txtStationOn =  new JTextField(20);
         StationAutoCompleter stationAutoCompleterOn = new StationAutoCompleter(txtStationOn);
         this.add(txtStationOn);
 
@@ -45,9 +51,9 @@ public class TabTravel extends JPanel{
         this.add(btnTouchOn);
 
         JLabel lblDateTouchOff = new JLabel("Touch off time");
-        JTextField txtDateTouchOff =  new JTextField(6);
+        txtDateTouchOff =  new JTextField(6);
         txtDateTouchOff.setText(getDateFormat().format(getTimeNow()));
-        JTextField txtTimeTouchOff =  new JTextField(4);
+        txtTimeTouchOff =  new JTextField(4);
         txtTimeTouchOff.setText(getTimeFormat().format(getTimeNow()));
         this.add(lblDateTouchOff);
         this.add(txtDateTouchOff);
@@ -56,11 +62,16 @@ public class TabTravel extends JPanel{
         JLabel lblStationOff = new JLabel("Touch off station");
         this.add(lblStationOff);
 
-        JTextField txtStationOff =  new JTextField(20);
+        txtStationOff =  new JTextField(20);
         StationAutoCompleter stationAutoCompleterOff = new StationAutoCompleter(txtStationOff);
         this.add(txtStationOff);
 
         JButton btnTouchOff = new JButton("Touch off");
+        btnTouchOff.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                touchOff();
+            }
+        });
         this.add(btnTouchOff);
 
         errTouchOn = CreateErrorLabel();
@@ -139,21 +150,109 @@ public class TabTravel extends JPanel{
     private JLabel CreateErrorLabel(){
         JLabel label = new JLabel();
         label.setForeground(ERROR_COLOR);
-        label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 12));
+        label.setFont(new Font(Font.SANS_SERIF, Font.PLAIN, 11));
         return label;
     }
 
     private void touchOn(){
-        if(Application.getInstance().getMykiCard().getBalance() < 10)
-            errTouchOn.setText("Your Myki card balance is less than $10. Please recharge before using it");
+        if(checkTouchOnInput()){
+            Station station = getStation(txtStationOn.getText());
+        }
+    }
+
+    private void touchOff(){
+        if(checkTouchOffInput()){
+            Station station = getStation(txtStationOff.getText());
+        }
+    }
+
+    private boolean checkTouchOnInput(){
+        clearError();
+        boolean isValid = true;
+        String errMessage = "";
+
+        if(Application.getInstance().getMykiCard().getBalance() < 10){
+            errMessage += "Your Myki card balance is less than $10. Please recharge before using it <BR>";
+            isValid = false;
+        }
+
+        Date touchOnTime = getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText());
+        if(touchOnTime == null){
+            errMessage += "Touch on date time is not valid <BR>";
+            isValid = false;
+        }
+
+        Station station = getStation(txtStationOn.getText());
+        if(station == null) {
+            errMessage += "Station cannot be found <BR>";
+            isValid = false;
+        }
+
+        errTouchOn.setText("<HTML>" + errMessage + "</HTML>");
+        return isValid;
+    }
+
+    private boolean checkTouchOffInput(){
+        clearError();
+        boolean isValid = true;
+        String errMessage = "";
+
+        Date touchOnTime = getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText());
+        if(touchOnTime == null){
+            errMessage += "Touch on date time is not valid <BR>";
+            isValid = false;
+        }
+
+        Station station = getStation(txtStationOff.getText());
+        if(station == null) {
+            errMessage += "Station cannot be found <BR>";
+            isValid = false;
+        }
+
+        errTouchOff.setText("<HTML>" + errMessage + "</HTML>");
+        return isValid;
+    }
+
+
+    private Station getStation(String name){
+        return DataLoader.getInstance().getStation(name);
+    }
+
+    private void clearError(){
+        errTouchOn.setText("");
+        errTouchOff.setText("");
+    }
+
+    private Date getTime(String date, String time){
+        try{
+            String combinedDateTime = String.format("%s %s", date, time);
+            SimpleDateFormat formatter = new SimpleDateFormat(String.format("%s %s", DATE_FORMAT, TIME_FORMAT));
+
+            return formatter.parse(combinedDateTime);
+        }catch (Exception ex){
+            return null;
+        }
+    }
+
+    public void updateData(){
+        MykiCard mykiCard = Application.getInstance().getMykiCard();
+        NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
+
+//        lblBalanceNumber.setText(numberFormatter.format(mykiCard.getBalance()));
+
+//        java.util.List listData = new ArrayList<String>();
+//        for(TopUpLog log : mykiCard.getTopUpLogs()){
+//            listData.add(log);
+//        }
+//        lstTopupHistory.setListData(listData.toArray());
     }
 
     private SimpleDateFormat getDateFormat(){
-        return new SimpleDateFormat("dd/MM/yy");
+        return new SimpleDateFormat(DATE_FORMAT);
     }
 
     private SimpleDateFormat getTimeFormat(){
-        return new SimpleDateFormat("HH:mm");
+        return new SimpleDateFormat(TIME_FORMAT);
     }
 
     private Date getTimeNow(){

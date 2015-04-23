@@ -50,6 +50,7 @@ public class Application {
 
     private void updateData(){
         tabTopup.updateData();
+        tabTravel.updateData();
     }
 
     public MykiCard getMykiCard() {
