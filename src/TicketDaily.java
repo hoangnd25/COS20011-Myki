@@ -1,11 +1,16 @@
-public class TicketDaily {
-    public static float getZone1Fare() {
-        return TicketTwoHours.getZone1Fare() * 2;
+import java.util.Date;
+
+public class TicketDaily extends TicketTwoHours{
+
+    public TicketDaily(){}
+    public TicketDaily(Date time){
+        expireAt = DateUtils.getTimeTomorrowAt3(time);
     }
-    public static float getZone2Fare() {
-        return TicketTwoHours.getZone2Fare() * 2;
+
+    public double getZone1Fare() {
+        return super.getZone1Fare() * 2;
     }
-    public static float getZone1And2Fare() {
-        return getZone1Fare();
+    public double getZone2Fare() {
+        return super.getZone2Fare() * 2;
     }
 }

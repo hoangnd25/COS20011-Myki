@@ -6,6 +6,7 @@ public class MykiCard {
     private double balance;
     private List<TravelLog> travelLogs;
     private List<TopUpLog> topUpLogs;
+    private Ticket activeTicket;
 
     public MykiCard(int id) {
         this(id, 0);
@@ -19,6 +20,9 @@ public class MykiCard {
     }
 
     public void touchOn(Date time, Station station){
+        if(getTravelLogsForTheDay(time).isEmpty())
+            activeTicket = new TicketTwoHours(time);
+
         touchOff(time, station);
         TravelLog log = new TravelLog(time, null, station, null);
         travelLogs.add(log);
@@ -34,6 +38,13 @@ public class MykiCard {
                 List<TrainLine> intersectLines = new ArrayList<TrainLine>(log.getTouchOffStation().getTrainLines());
                 intersectLines.retainAll(log.getTouchOnStation().getTrainLines());
 
+                Date touchOnTime = log.getTouchOnTime();
+                Date touchOffTime = log.getTouchOffTime();
+                if(log.getTouchOnStation().getId() == log.getTouchOffStation().getId() && DateUtils.getTimeAfter15Mins(touchOnTime).after(touchOffTime)){
+                    log.setFee(0);
+                    return;
+                }
+
                 boolean isTravellingZone1 = false;
                 boolean isTravellingZone2 = false;
 
@@ -41,7 +52,10 @@ public class MykiCard {
                 int touchOffZone = log.getTouchOffStation().getZone();
 
                 if(touchOnZone == touchOffZone){
-                    if(touchOnZone == Station.ZONE1){
+                    if(touchOnZone == Station.OVERLAP){
+                        isTravellingZone1 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE1);
+                        isTravellingZone2 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE2);
+                    }else if(touchOnZone == Station.ZONE1){
                         isTravellingZone1 = true;
                         isTravellingZone2 = false;
 
@@ -60,9 +74,15 @@ public class MykiCard {
                         if(sum == Station.ZONE1){
                             isTravellingZone1 = true;
                             isTravellingZone2 = false;
+
+                            if(intersectLines.isEmpty())
+                                isTravellingZone2 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE2);
                         }else{
                             isTravellingZone1 = false;
                             isTravellingZone2 = true;
+
+                            if(intersectLines.isEmpty())
+                                isTravellingZone1 = isTransitStationInZone(log.getTouchOnStation(), log.getTouchOffStation(), Station.ZONE1);
                         }
                     }else{
                         isTravellingZone1 = true;
@@ -70,8 +90,26 @@ public class MykiCard {
                     }
                 }
 
-                //
+                if(activeTicket.isTravellingZone1())
+                    isTravellingZone1 = true;
 
+                if(activeTicket.isTravellingZone2())
+                    isTravellingZone2 = true;
+
+                if(activeTicket.getExpireAt().before(touchOffTime)){
+                    activeTicket = new TicketDaily(touchOffTime);
+                }
+
+                if(isTravellingZone2 && !isTravellingZone1){
+                    log.setFee(charge(activeTicket.getZone2Fare(), touchOffTime));
+                }else if(isTravellingZone1 && !isTravellingZone2){
+                    log.setFee(charge(activeTicket.getZone1Fare(), touchOffTime));
+                }else{
+                    log.setFee(charge(activeTicket.getZone1And2Fare(), touchOffTime));
+                }
+
+                activeTicket.setTravellingZone1(isTravellingZone1);
+                activeTicket.setTravellingZone2(isTravellingZone2);
             }
         }
     }
@@ -82,11 +120,14 @@ public class MykiCard {
         this.topUpLogs.add(log);
     }
 
-    private void charge(double amount, Date time){
+    private double charge(double amount, Date time){
         double amountPaid = getAmountPaidForTheDay(time);
         if(amount > amountPaid){
             this.balance -= (amount - amountPaid);
+            Application.getInstance().updateData();
+            return amount - amountPaid;
         }
+        return 0;
     }
 
     private List<TravelLog> getTravelLogsForTheDay(Date time){

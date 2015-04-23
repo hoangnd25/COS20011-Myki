@@ -1,4 +1,6 @@
+import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class TravelLog implements Comparable<TravelLog>{
 
@@ -6,13 +8,14 @@ public class TravelLog implements Comparable<TravelLog>{
     private Date touchOffTime;
     private Station touchOnStation;
     private Station touchOffStation;
-    private float fee;
+    private double fee;
 
     public TravelLog(Date touchOnTime, Date touchOffTime, Station touchOnStation, Station touchOffStation) {
         this.touchOnTime = touchOnTime;
         this.touchOffTime = touchOffTime;
         this.touchOnStation = touchOnStation;
         this.touchOffStation = touchOffStation;
+        this.fee = 0;
     }
 
     public TravelLog() {
@@ -50,18 +53,19 @@ public class TravelLog implements Comparable<TravelLog>{
         this.touchOffStation = touchOffStation;
     }
 
-    public float getFee() {
+    public double getFee() {
         return fee;
     }
 
-    public void setFee(float fee) {
+    public void setFee(double fee) {
         this.fee = fee;
     }
 
     @Override
     public String toString() {
         if(touchOffTime != null && touchOffStation != null){
-            return String.format("%s: %s - %s: %s", DateUtils.formatDateTime(touchOnTime), touchOnStation, DateUtils.formatDateTime(touchOffTime), touchOffStation);
+            NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
+            return String.format("%s: %s - %s: %s (%s)", DateUtils.formatDateTime(touchOnTime), touchOnStation, DateUtils.formatDateTime(touchOffTime), touchOffStation, numberFormatter.format(fee));
         }else{
             return String.format("%s: %s", DateUtils.formatDateTime(touchOnTime), touchOnStation);
         }
