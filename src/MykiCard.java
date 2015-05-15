@@ -135,11 +135,21 @@ public class MykiCard {
 
         Date todayAt3 = DateUtils.getTimeAt3(time);
         Date tomorrowAt3 = DateUtils.getTimeTomorrowAt3(time);
+        Date yesterdayAt3 = DateUtils.getTimeYesterdayAt3(time);
 
-        for (int i = 0; i < this.travelLogs.size(); i++) {
-            TravelLog log = this.travelLogs.get(i);
-            if(log.getTouchOnTime().compareTo(todayAt3) >= 0 && log.getTouchOnTime().compareTo(tomorrowAt3) < 0){
-                logs.add(log);
+        if(time.compareTo(todayAt3) < 0){
+            for (int i = 0; i < this.travelLogs.size(); i++) {
+                TravelLog log = this.travelLogs.get(i);
+                if (log.getTouchOnTime().compareTo(yesterdayAt3) >= 0 && log.getTouchOnTime().compareTo(todayAt3) < 0) {
+                    logs.add(log);
+                }
+            }
+        }else{
+            for (int i = 0; i < this.travelLogs.size(); i++) {
+                TravelLog log = this.travelLogs.get(i);
+                if (log.getTouchOnTime().compareTo(todayAt3) >= 0 && log.getTouchOnTime().compareTo(tomorrowAt3) < 0) {
+                    logs.add(log);
+                }
             }
         }
 

@@ -37,6 +37,13 @@ public class DateUtils {
         return cal.getTime();
     }
 
+    public static Date getTimeYesterdayAt3(Date time){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(getTimeAt3(time));
+        cal.set(Calendar.DATE, cal.get(Calendar.DATE) - 1);
+        return cal.getTime();
+    }
+
     public static String formatDateTime(Date time){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yy HH:mm");
         return formatter.format(time);
