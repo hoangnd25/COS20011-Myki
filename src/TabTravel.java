@@ -154,9 +154,9 @@ public class TabTravel extends JPanel{
 
         layout.putConstraint(SpringLayout.WEST, lblTravelHistory, MARGIN_LEFT, SpringLayout.WEST, this);
         layout.putConstraint(SpringLayout.SOUTH, lblTravelHistory, -7, SpringLayout.NORTH, scrollPane);
-        layout.putConstraint(SpringLayout.SOUTH, txtHistoryStartDate, 0, SpringLayout.NORTH, scrollPane);
-        layout.putConstraint(SpringLayout.SOUTH, txtHistoryEndDate, 0, SpringLayout.NORTH, scrollPane);
-        layout.putConstraint(SpringLayout.SOUTH, btnUpdateHistory, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.BASELINE, txtHistoryStartDate, 0, SpringLayout.BASELINE, lblTravelHistory);
+        layout.putConstraint(SpringLayout.BASELINE, txtHistoryEndDate, 0, SpringLayout.BASELINE, lblTravelHistory);
+        layout.putConstraint(SpringLayout.BASELINE, btnUpdateHistory, 0, SpringLayout.BASELINE, lblTravelHistory);
         layout.putConstraint(SpringLayout.WEST, txtHistoryStartDate, MARGIN_LEFT, SpringLayout.EAST, lblTravelHistory);
         layout.putConstraint(SpringLayout.WEST, txtHistoryEndDate, MARGIN_LEFT, SpringLayout.EAST, txtHistoryStartDate);
         layout.putConstraint(SpringLayout.WEST, btnUpdateHistory, MARGIN_LEFT, SpringLayout.EAST, txtHistoryEndDate);

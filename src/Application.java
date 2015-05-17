@@ -29,7 +29,7 @@ public class Application {
     }
 
     private JFrame createGUI(){
-        JFrame frame = new JFrame("209522X - Hoang Nguyen");
+        JFrame frame = new JFrame("COS20011_A02_T009 - 209522X - Hoang Nguyen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(900, 600);
 
