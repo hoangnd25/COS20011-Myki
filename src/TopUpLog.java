@@ -3,28 +3,54 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * The type Top up log.
+ */
 public class TopUpLog implements Comparable<TopUpLog>{
 
     private double amount;
     private Date time;
 
+    /**
+     * Instantiates a new Top up log.
+     *
+     * @param amount the amount charged
+     */
     public TopUpLog(double amount) {
         this.amount = amount;
         setTime();
     }
 
+    /**
+     * Instantiates a new Top up log.
+     */
     public TopUpLog(){
         setTime();
     }
 
+    /**
+     * Gets time.
+     *
+     * @return the time
+     */
     public Date getTime() {
         return time;
     }
 
+    /**
+     * Gets amount.
+     *
+     * @return the amount
+     */
     public double getAmount() {
         return amount;
     }
 
+    /**
+     * Sets amount.
+     *
+     * @param amount the amount
+     */
     public void setAmount(double amount) {
         this.amount = amount;
     }

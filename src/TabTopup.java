@@ -8,23 +8,29 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-public class TabTopup extends JPanel{
+/**
+ * The type Tab topup.
+ */
+public class TabTopup extends JPanel
+{
+    private final int MARGIN_TOP = 20;
+    private final int MARGIN_BOTTOM = -MARGIN_TOP;
+    private final int MARGIN_LEFT = 20;
+    private final int MARGIN_RIGHT = -MARGIN_LEFT;
+    private final int LABEL_MAX_WIDTH = 150;
+    private final int ROW_SPACE = 20;
+    private final Color ERROR_COLOR = Color.red;
 
-    final int MARGIN_TOP = 20;
-    final int MARGIN_BOTTOM = -MARGIN_TOP;
-    final int MARGIN_LEFT = 20;
-    final int MARGIN_RIGHT = -MARGIN_LEFT;
-    final int LABEL_MAX_WIDTH = 150;
-    final int ROW_SPACE = 20;
-    final Color ERROR_COLOR = Color.red;
-
-    JLabel lblBalanceNumber, lblMessage,
+    private JLabel lblBalanceNumber, lblMessage,
            errExpireDate, errCardNumber, errHolderName, errAddress, errAmount
     ;
-    JTextField txtCardNumber, txtHolderName, txtExpireDate, txtAddress, txtAmount,
+    private JTextField txtCardNumber, txtHolderName, txtExpireDate, txtAddress, txtAmount,
                txtHistoryStartDate, txtHistoryEndDate;
-    JList lstTopupHistory;
+    private JList lstTopupHistory;
 
+    /**
+     * Instantiates a new Tab topup. Create GUI elements
+     */
     public TabTopup()
     {
         SpringLayout layout = new SpringLayout();
@@ -190,6 +196,10 @@ public class TabTopup extends JPanel{
 
     }
 
+    /**
+     * Convenient method for creating error label
+     * @return the label
+     */
     private JLabel CreateErrorLabel(){
         JLabel label = new JLabel();
         label.setForeground(ERROR_COLOR);
@@ -197,6 +207,9 @@ public class TabTopup extends JPanel{
         return label;
     }
 
+    /**
+     * Handle top up button clicked
+     */
     private void topUp(){
         if(checkCreditCardInput()){
             Application.getInstance().getMykiCard().topUp(getTopUpAmount());
@@ -207,6 +220,9 @@ public class TabTopup extends JPanel{
         }
     }
 
+    /**
+     * Validate inputs
+     */
     private boolean checkCreditCardInput(){
         clearError();
         boolean isInputValid = true;
@@ -253,6 +269,9 @@ public class TabTopup extends JPanel{
         return isInputValid;
     }
 
+    /**
+     * try to get top up amount 
+     */
     private double getTopUpAmount(){
         try{
             return Double.parseDouble(txtAmount.getText());
@@ -261,6 +280,9 @@ public class TabTopup extends JPanel{
         }
     }
 
+    /**
+     * Clear error labels
+     */
     private void clearError(){
         errHolderName.setText("");
         errCardNumber.setText("");
@@ -270,6 +292,9 @@ public class TabTopup extends JPanel{
         lblMessage.setText("");
     }
 
+    /**
+     * Update GUI with the current data.
+     */
     public void updateData(){
         MykiCard mykiCard = Application.getInstance().getMykiCard();
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());

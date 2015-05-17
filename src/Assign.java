@@ -1,6 +1,13 @@
+/**
+ * The starting point of application.
+ */
 public class Assign {
+    /**
+     * Main function. Application is started here
+     *
+     * @param args the args
+     */
     public static void main (String [] args){
-//        List<TrainLine> lines = DataLoader.getInstance().getTrainLines();
         Application.getInstance().run();
     }
 }

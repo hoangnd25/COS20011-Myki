@@ -1,8 +1,20 @@
 import java.util.Date;
 
+/**
+ * The type Ticket daily.
+ */
 public class TicketDaily extends TicketTwoHours{
 
+    /**
+     * Instantiates a new Ticket daily.
+     */
     public TicketDaily(){}
+
+    /**
+     * Instantiates a new Ticket daily with time
+     *
+     * @param time the time
+     */
     public TicketDaily(Date time){
         expireAt = DateUtils.getTimeTomorrowAt3(time);
     }

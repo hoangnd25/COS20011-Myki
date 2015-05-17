@@ -5,12 +5,26 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
 
+/**
+ * The simple Auto completer. <p>
+ * This class will create a popup list with suggestion. <p>
+ * When user selected an item from the list, a formatted string will be set to the text field <p>
+ * Children class must implement two methods: <p>
+ * - {@link #getSuggestionForValue(String) getSuggestionForValue} <p>
+ * - {@link #formatSelectedValue(Object) formatSelectedValue} <p>
+ * Create auto completer associate with a text field
+ */
 public abstract class AutoCompleter{
 
     private JList list = new JList();
     private JPopupMenu popup = new JPopupMenu();
     private JTextComponent textComp;
 
+    /**
+     * Instantiates a new Auto completer for a text field
+     *
+     * @param comp the text field that will be attached with an auto completer
+     */
     public AutoCompleter(JTextField comp){
         textComp = comp;
         // Retain selection after losing focus
@@ -68,6 +82,10 @@ public abstract class AutoCompleter{
         textComp.requestFocus();
     }
 
+    /**
+     * Try to select an item
+     * @param value number that specify position of the needed item related to current selected item
+     */
     private void selectItem(int value){
         int potentialIndex = list.getSelectedIndex() + value;
 
@@ -79,6 +97,9 @@ public abstract class AutoCompleter{
         }
     }
 
+    /**
+     * Get currently selected item and format it then set it to the textfield
+     */
     private void acceptItem(){
         Object selected = list.getSelectedValue();
         if(selected == null)
@@ -139,22 +160,46 @@ public abstract class AutoCompleter{
             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
                 textComp.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), null);
             }
-            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {}
-            public void popupMenuCanceled(PopupMenuEvent e) {}
+
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            }
+
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
         });
 
         list.addMouseListener(new MouseListener() {
             public void mouseClicked(MouseEvent e) {
                 acceptItem();
             }
-            public void mouseEntered(MouseEvent e){}
-            public void mouseReleased(MouseEvent e){}
-            public void mousePressed(MouseEvent e){}
-            public void mouseExited(MouseEvent e){}
+
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            public void mousePressed(MouseEvent e) {
+            }
+
+            public void mouseExited(MouseEvent e) {
+            }
         });
     }
 
+    /**
+     * Gets suggestion for a given string.
+     *
+     * @param value this value will be used to generate suggestions
+     * @return the suggestion for value
+     */
     protected abstract List getSuggestionForValue(String value);
 
+    /**
+     * Format selected item.
+     *
+     * @param value the item
+     * @return the formatted string taht will be set to the text field
+     */
     protected abstract String formatSelectedValue(Object value);
 }

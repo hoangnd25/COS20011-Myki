@@ -2,6 +2,9 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The type Data loader. Handle data loading from files
+ */
 public class DataLoader {
 
     private static DataLoader instance = null;
@@ -16,6 +19,11 @@ public class DataLoader {
         lines = new ArrayList<TrainLine>();
     }
 
+    /**
+     * Gets instance of DataLoader
+     *
+     * @return the instance
+     */
     public static DataLoader getInstance() {
         if(instance == null) {
             instance = new DataLoader();
@@ -23,11 +31,20 @@ public class DataLoader {
         return instance;
     }
 
+    /**
+     * Load train lines and stations data
+     */
     public void setUpStationData(){
         loadStations();
         loadTrainLines();
     }
 
+    /**
+     * Get stations by name
+     *
+     * @param name the name
+     * @return the stations
+     */
     public Station getStation(String name){
         for(Station station : getStations()){
             if(station.getName().equals(name))
@@ -36,6 +53,11 @@ public class DataLoader {
         return null;
     }
 
+    /**
+     * Get all stations.
+     *
+     * @return the list of all stations
+     */
     public List<Station> getStations(){
         if(stations.size() == 0){
 
@@ -43,6 +65,11 @@ public class DataLoader {
         return stations;
     }
 
+    /**
+     * Get all train lines.
+     *
+     * @return the list of train lines
+     */
     public List<TrainLine> getTrainLines(){
         if(lines.size() == 0){
             loadTrainLines();
@@ -50,7 +77,9 @@ public class DataLoader {
 
         return lines;
     }
-
+    /**
+     * Load stations if the list is empty
+     */
     private void loadStations(){
         File file = new File(DataLoader.FILE_STATION);
         if(!(file.exists() && !file.isDirectory())) {
@@ -80,6 +109,9 @@ public class DataLoader {
         }
     }
 
+    /**
+     * Load train lines if the list is empty
+     */
     private void loadTrainLines(){
         File file = new File(DataLoader.FILE_TRAINLINE);
         if(!(file.exists() && !file.isDirectory())) {
@@ -123,11 +155,17 @@ public class DataLoader {
         }
     }
 
+    /**
+     * Create data files. Create default data files if it is not exist
+     */
     public void createDataFiles(){
         createStationDataFile();
         createLineDataFile();
     }
 
+    /**
+     * Create default data for stations
+     */
     private void createStationDataFile(){
         String[] stations = {
             "1,Parliament Station,1",
@@ -188,6 +226,9 @@ public class DataLoader {
         }
     }
 
+    /**
+     * Create default data for train lines
+     */
     private void createLineDataFile(){
         String[] lines = {
             "Belgrave Line,1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32",

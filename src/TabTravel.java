@@ -11,19 +11,25 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * The type Tab travel.
+ */
 public class TabTravel extends JPanel{
 
-    final int MARGIN_TOP = 20;
-    final int MARGIN_LEFT = 20;
-    final int MARGIN_RIGHT = -MARGIN_LEFT;
-    final Color ERROR_COLOR = Color.red;
+    private final int MARGIN_TOP = 20;
+    private final int MARGIN_LEFT = 20;
+    private final int MARGIN_RIGHT = -MARGIN_LEFT;
+    private final Color ERROR_COLOR = Color.red;
 
-    JLabel errTouchOn, errTouchOff;
-    JTextField txtDateTouchOn, txtTimeTouchOn, txtStationOn,
+    private JLabel errTouchOn, errTouchOff;
+    private JTextField txtDateTouchOn, txtTimeTouchOn, txtStationOn,
                txtDateTouchOff, txtTimeTouchOff, txtStationOff,
                txtHistoryStartDate, txtHistoryEndDate;
-    JList lstTravelHistory;
+    private JList lstTravelHistory;
 
+    /**
+     * Instantiates a new Tab travel and create GUI elements
+     */
     public TabTravel(){
         SpringLayout layout = new SpringLayout();
         this.setLayout(layout);
@@ -170,6 +176,11 @@ public class TabTravel extends JPanel{
         layout.putConstraint(SpringLayout.WEST, errTouchOff, 2, SpringLayout.WEST, txtStationOff);
     }
 
+    /**
+     * Convenient method for creating error label
+     *
+     * @return the label
+     */
     private JLabel CreateErrorLabel(){
         JLabel label = new JLabel();
         label.setForeground(ERROR_COLOR);
@@ -177,6 +188,9 @@ public class TabTravel extends JPanel{
         return label;
     }
 
+    /**
+     * Handle touch on button clicked
+     */
     private void touchOn(){
         if(checkTouchOnInput()){
             Station station = getStation(txtStationOn.getText());
@@ -184,7 +198,9 @@ public class TabTravel extends JPanel{
             updateData();
         }
     }
-
+    /**
+     * Handle touch off button clicked
+     */
     private void touchOff(){
         if(checkTouchOffInput()){
             Station station = getStation(txtStationOff.getText());
@@ -193,6 +209,9 @@ public class TabTravel extends JPanel{
         }
     }
 
+    /**
+     * Validate inputs for touch on
+     */
     private boolean checkTouchOnInput(){
         clearError();
         boolean isValid = true;
@@ -219,6 +238,9 @@ public class TabTravel extends JPanel{
         return isValid;
     }
 
+    /**
+     * Validate inputs for touch off
+     */
     private boolean checkTouchOffInput(){
         clearError();
         boolean isValid = true;
@@ -240,16 +262,24 @@ public class TabTravel extends JPanel{
         return isValid;
     }
 
-
+    /**
+     * Short  hand method for getting station by name from DataLoader
+     */
     private Station getStation(String name){
         return DataLoader.getInstance().getStation(name);
     }
 
+    /**
+     * Clear error labels
+     */
     private void clearError(){
         errTouchOn.setText("");
         errTouchOff.setText("");
     }
 
+    /**
+     * Update data of the GUI
+     */
     public void updateData(){
         MykiCard mykiCard = Application.getInstance().getMykiCard();
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());

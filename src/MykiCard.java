@@ -1,5 +1,8 @@
 import java.util.*;
 
+/**
+ * The type Myki card.
+ */
 public class MykiCard {
 
     private int id;
@@ -8,10 +11,21 @@ public class MykiCard {
     private List<TopUpLog> topUpLogs;
     private Ticket activeTicket;
 
+    /**
+     * Instantiates a new Myki card with id, balance default to 0
+     *
+     * @param id the id of myki card
+     */
     public MykiCard(int id) {
         this(id, 0);
     }
 
+    /**
+     * Instantiates a new Myki card with id and balance
+     *
+     * @param id the id of myki card
+     * @param balance the balance of myki card
+     */
     public MykiCard(int id, double balance) {
         this.id = id;
         this.balance = balance;
@@ -19,6 +33,12 @@ public class MykiCard {
         topUpLogs = new ArrayList<TopUpLog>();
     }
 
+    /**
+     * Stimulate touch on action. Automatically touch off
+     *
+     * @param time the time
+     * @param station the station
+     */
     public void touchOn(Date time, Station station){
         if(getTravelLogsForTheDay(time).isEmpty())
             activeTicket = new TicketTwoHours(time);
@@ -28,6 +48,12 @@ public class MykiCard {
         travelLogs.add(log);
     }
 
+    /**
+     * Stimulate touch off action and calculate travel fees
+     *
+     * @param time the time
+     * @param station the station
+     */
     public void touchOff(Date time, Station station){
         for (int i = 0; i < travelLogs.size(); i++) {
             TravelLog log = travelLogs.get(i);
@@ -114,12 +140,23 @@ public class MykiCard {
         }
     }
 
+    /**
+     * Top up myki card
+     *
+     * @param amount the amount
+     */
     public void topUp(double amount){
         TopUpLog log = new TopUpLog(amount);
         this.balance += amount;
         this.topUpLogs.add(log);
     }
 
+    /**
+     * Stimulate charging money of the myki card. Paid ammount will be deducted for the day
+     *
+     * @param amount the amount that will used to calculate
+     * @param time the time
+     */
     private double charge(double amount, Date time){
         double amountPaid = getAmountPaidForTheDay(time);
         if(amount > amountPaid){
@@ -130,6 +167,11 @@ public class MykiCard {
         return 0;
     }
 
+    /**
+     * Find travel today's histories (3am today to 3am of the next day)
+     *
+     * @param time the time
+     */
     private List<TravelLog> getTravelLogsForTheDay(Date time){
         List<TravelLog> logs = new ArrayList<TravelLog>();
 
@@ -156,6 +198,11 @@ public class MykiCard {
         return logs;
     }
 
+    /**
+     * Find total amount paid for ticket today
+     *
+     * @param time the time
+     */
     private double getAmountPaidForTheDay(Date time){
         double amountPaidToday = 0;
         for(TravelLog log : getTravelLogsForTheDay(time)){
@@ -164,6 +211,13 @@ public class MykiCard {
         return amountPaidToday;
     }
 
+    /**
+     * Check if in order to travel from station 1 to station 2 must pass through a given zone
+     *
+     * @param s1 depart station
+     * @param s2 destination station
+     * @param zone the zone will be used to check if the travel must pass through
+     */
     private boolean isTransitStationInZone(Station s1, Station s2, int zone){
         List<Station> s1LineStations = s1.getTrainLines().get(0).getStations();
         List<Station> s2LineStations = s2.getTrainLines().get(0).getStations();
@@ -178,27 +232,57 @@ public class MykiCard {
         return false;
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * Gets balance.
+     *
+     * @return the balance
+     */
     public double getBalance() {
         return balance;
     }
 
+    /**
+     * Sets balance.
+     *
+     * @param balance the balance
+     */
     public void setBalance(double balance) {
         this.balance = balance;
     }
 
+    /**
+     * Gets travel logs.
+     *
+     * @return the travel logs
+     */
     public List<TravelLog> getTravelLogs() {
         Collections.sort(travelLogs);
         return travelLogs;
     }
 
+    /**
+     * Gets top up logs.
+     *
+     * @return the top up logs
+     */
     public List<TopUpLog> getTopUpLogs() {
         Collections.sort(topUpLogs);
         return topUpLogs;
