@@ -33,6 +33,7 @@ public class TravelLog implements Comparable<TravelLog>{
      * Instantiates a new Travel log.
      */
     public TravelLog() {
+        this.fee = 0;
     }
 
     /**

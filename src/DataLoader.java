@@ -10,9 +10,13 @@ public class DataLoader {
     private static DataLoader instance = null;
     private List<Station> stations;
     private List<TrainLine> lines;
+    private List<TravelLog> travelLogs;
+    private List<TopUpLog> topUpLogs;
 
     private static String FILE_STATION = "stations.txt";
     private static String FILE_TRAINLINE = "lines.txt";
+    private static String FILE_TOPUP = "topups.txt";
+    private static String FILE_TRAVEL = "travels.txt";
 
     private DataLoader() {
         stations = new ArrayList<Station>();
@@ -77,6 +81,157 @@ public class DataLoader {
 
         return lines;
     }
+
+    /**
+     * Get top up logs from file when the application start. Write data to file when application is running
+     */
+    public void syncTopupLogs(){
+        if(topUpLogs == null){
+            topUpLogs = new ArrayList<TopUpLog>();
+            topUpLogs = this.loadTopupLogs();
+            Application.getInstance().getMykiCard().setTopUpLogs(topUpLogs);
+            return;
+        }
+
+        List<TopUpLog> logs = Application.getInstance().getMykiCard().getTopUpLogs();
+        try {
+            File file = new File(DataLoader.FILE_TOPUP);
+            BufferedWriter output = new BufferedWriter(new FileWriter(file, false));
+            for (TopUpLog log: logs) {
+                String outputString = "";
+                outputString += DateUtils.formatDateTime(log.getTime()) + ",";
+                outputString += log.getAmount();
+                output.write(outputString);
+                output.newLine();
+            }
+            output.close();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Get travel logs from file when the application start. Write data to file when application is running
+     */
+    public void syncTravelLogs(){
+        if(travelLogs == null){
+            travelLogs = new ArrayList<TravelLog>();
+            travelLogs = this.loadTravelLogs();
+            Application.getInstance().getMykiCard().setTravelLogs(travelLogs);
+            return;
+        }
+
+        List<TravelLog> logs = Application.getInstance().getMykiCard().getTravelLogs();
+        try {
+            File file = new File(DataLoader.FILE_TRAVEL);
+            BufferedWriter output = new BufferedWriter(new FileWriter(file, false));
+            for (TravelLog log: logs) {
+                String outputString = "";
+                outputString += DateUtils.formatDateTime(log.getTouchOnTime()) + ",";
+                if(log.getTouchOffTime() != null){
+                    outputString += DateUtils.formatDateTime(log.getTouchOffTime()) + ",";
+                }else{
+                    outputString += ",";
+                }
+
+                outputString += log.getTouchOnStation().getName() + ",";
+                if(log.getTouchOffStation() != null){
+                    outputString += log.getTouchOffStation().getName() + ",";
+                }else{
+                    outputString += ",";
+                }
+
+                outputString += log.getFee() + ",";
+                output.write(outputString);
+                output.newLine();
+            }
+            output.close();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Load travel logs from file
+     */
+    private List<TravelLog> loadTravelLogs() {
+        List<TravelLog> logs = new ArrayList<TravelLog>();
+        File file = new File(DataLoader.FILE_TRAVEL);
+        if(!(file.exists() && !file.isDirectory())) {
+            return logs;
+        }
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+
+                TravelLog log = new TravelLog();
+                log.setTouchOnTime(DateUtils.getDateTime(data[0]));
+                if(!data[1].equals("")){
+                    log.setTouchOffTime(DateUtils.getDateTime(data[1]));
+                }
+
+                log.setTouchOnStation(getStation(data[2]));
+                if(!data[3].equals("")){
+                    log.setTouchOffStation(getStation(data[3]));
+                }
+
+                log.setFee(Double.parseDouble(data[4]));
+                logs.add(log);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return logs;
+    }
+
+    /**
+     * Load top up logs from file
+     */
+    private List<TopUpLog> loadTopupLogs(){
+        List<TopUpLog> logs = new ArrayList<TopUpLog>();
+        File file = new File(DataLoader.FILE_TOPUP);
+        if(!(file.exists() && !file.isDirectory())) {
+            return logs;
+        }
+
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+
+                TopUpLog log = new TopUpLog();
+                log.setTime(DateUtils.getDateTime(data[0]));
+                log.setAmount(Double.parseDouble(data[1]));
+                logs.add(log);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if(reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return logs;
+    }
+
     /**
      * Load stations if the list is empty
      */

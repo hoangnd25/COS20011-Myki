@@ -142,6 +142,22 @@ public class DateUtils {
     }
 
     /**
+     * Convert string to time.
+     *
+     * @param datetime the date time string
+     * @return the date
+     */
+    public static Date getDateTime(String datetime){
+        try{
+            SimpleDateFormat formatter = new SimpleDateFormat(String.format("%s %s", DATE_FORMAT, TIME_FORMAT));
+
+            return formatter.parse(datetime);
+        }catch (Exception ex){
+            return null;
+        }
+    }
+
+    /**
      * Convert string to date
      *
      * @param date the input string

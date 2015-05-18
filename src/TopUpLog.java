@@ -38,6 +38,15 @@ public class TopUpLog implements Comparable<TopUpLog>{
     }
 
     /**
+     * Sets time.
+     *
+     * @param time the time
+     */
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
+    /**
      * Gets amount.
      *
      * @return the amount

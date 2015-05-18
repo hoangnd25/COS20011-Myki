@@ -297,6 +297,8 @@ public class TabTopup extends JPanel
      */
     public void updateData(){
         MykiCard mykiCard = Application.getInstance().getMykiCard();
+        DataLoader.getInstance().syncTopupLogs();
+
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         java.util.List listData = new ArrayList<String>();

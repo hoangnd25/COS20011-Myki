@@ -279,6 +279,15 @@ public class MykiCard {
     }
 
     /**
+     * Sets travel logs.
+     *
+     * @param travelLogs the travel logs
+     */
+    public void setTravelLogs(List<TravelLog> travelLogs) {
+        this.travelLogs = travelLogs;
+    }
+
+    /**
      * Gets top up logs.
      *
      * @return the top up logs
@@ -286,5 +295,14 @@ public class MykiCard {
     public List<TopUpLog> getTopUpLogs() {
         Collections.sort(topUpLogs);
         return topUpLogs;
+    }
+
+    /**
+     * Sets top up logs.
+     *
+     * @param topUpLogs the top up logs
+     */
+    public void setTopUpLogs(List<TopUpLog> topUpLogs) {
+        this.topUpLogs = topUpLogs;
     }
 }
