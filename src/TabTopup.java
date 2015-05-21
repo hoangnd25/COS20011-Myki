@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class TabTopup extends JPanel{
@@ -19,7 +21,8 @@ public class TabTopup extends JPanel{
     JLabel lblBalanceNumber, lblMessage,
            errExpireDate, errCardNumber, errHolderName, errAddress, errAmount
     ;
-    JTextField txtCardNumber, txtHolderName, txtExpireDate, txtAddress, txtAmount;
+    JTextField txtCardNumber, txtHolderName, txtExpireDate, txtAddress, txtAmount,
+               txtHistoryStartDate, txtHistoryEndDate;
     JList lstTopupHistory;
 
     public TabTopup()
@@ -88,6 +91,21 @@ public class TabTopup extends JPanel{
 
         JLabel lblTopupHistory = new JLabel("Top Up History");
         this.add(lblTopupHistory);
+        txtHistoryStartDate = new JTextField();
+        txtHistoryStartDate.setText(DateUtils.getDateFormat().format(DateUtils.getTimeNow()));
+        txtHistoryEndDate = new JTextField();
+        Calendar tomorrowDate = Calendar.getInstance();
+        tomorrowDate.add(Calendar.DATE, 1);
+        txtHistoryEndDate.setText(DateUtils.getDateFormat().format(tomorrowDate.getTime()));
+        this.add(txtHistoryStartDate);
+        this.add(txtHistoryEndDate);
+        JButton btnUpdateHistory = new JButton("Update");
+        btnUpdateHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateData();
+            }
+        });
+        this.add(btnUpdateHistory);
 
         lstTopupHistory = new JList();
         JScrollPane scrollPane = new JScrollPane(lstTopupHistory);
@@ -162,7 +180,13 @@ public class TabTopup extends JPanel{
         layout.putConstraint(SpringLayout.WIDTH, scrollPane, -(MARGIN_LEFT * 2), SpringLayout.WIDTH, this);
 
         layout.putConstraint(SpringLayout.WEST, lblTopupHistory, MARGIN_LEFT, SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.SOUTH, lblTopupHistory, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, lblTopupHistory, -7, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, txtHistoryStartDate, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, txtHistoryEndDate, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, btnUpdateHistory, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.WEST, txtHistoryStartDate, MARGIN_LEFT, SpringLayout.EAST, lblTopupHistory);
+        layout.putConstraint(SpringLayout.WEST, txtHistoryEndDate, MARGIN_LEFT, SpringLayout.EAST, txtHistoryStartDate);
+        layout.putConstraint(SpringLayout.WEST, btnUpdateHistory, MARGIN_LEFT, SpringLayout.EAST, txtHistoryEndDate);
 
     }
 
@@ -250,11 +274,22 @@ public class TabTopup extends JPanel{
         MykiCard mykiCard = Application.getInstance().getMykiCard();
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
-        lblBalanceNumber.setText(numberFormatter.format(mykiCard.getBalance()));
-
         java.util.List listData = new ArrayList<String>();
+
+        Date startDate = DateUtils.getDate(txtHistoryStartDate.getText());
+        Date endDate = DateUtils.getDate(txtHistoryEndDate.getText());
+        if(startDate == null || endDate == null){
+            lstTopupHistory.setListData(listData.toArray());
+            return;
+        }
+
+        lblBalanceNumber.setText(
+            String.format("%s (This balance will be updated automatically)",numberFormatter.format(mykiCard.getBalance()))
+        );
+
         for(TopUpLog log : mykiCard.getTopUpLogs()){
-            listData.add(log);
+            if(log.getTime().compareTo(startDate) >= 0 && endDate.compareTo(log.getTime()) >= 0)
+                listData.add(log.toString());
         }
         lstTopupHistory.setListData(listData.toArray());
     }

@@ -56,6 +56,6 @@ public class Station {
 
     @Override
     public String toString() {
-        return String.format("%s (%s)", this.getName(), this.getFormatedZone() );
+        return String.format("%s (%s - %s)", this.getName(), this.getFormatedZone(), this.getTrainLines() );
     }
 }

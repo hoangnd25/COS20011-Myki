@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,12 +17,11 @@ public class TabTravel extends JPanel{
     final int MARGIN_LEFT = 20;
     final int MARGIN_RIGHT = -MARGIN_LEFT;
     final Color ERROR_COLOR = Color.red;
-    final String DATE_FORMAT = "dd/MM/yy";
-    final String TIME_FORMAT = "HH:mm";
 
     JLabel errTouchOn, errTouchOff;
     JTextField txtDateTouchOn, txtTimeTouchOn, txtStationOn,
-               txtDateTouchOff, txtTimeTouchOff, txtStationOff;
+               txtDateTouchOff, txtTimeTouchOff, txtStationOff,
+               txtHistoryStartDate, txtHistoryEndDate;
     JList lstTravelHistory;
 
     public TabTravel(){
@@ -29,14 +30,14 @@ public class TabTravel extends JPanel{
 
         JLabel lblDateTouchOn = new JLabel("Touch on time");
         txtDateTouchOn =  new JTextField(6);
-        txtDateTouchOn.setText(getDateFormat().format(getTimeNow()));
+        txtDateTouchOn.setText(DateUtils.getDateFormat().format(DateUtils.getTimeNow()));
         txtTimeTouchOn =  new JTextField(4);
-        txtTimeTouchOn.setText(getTimeFormat().format(getTimeNow()));
+        txtTimeTouchOn.setText(DateUtils.getTimeFormat().format(DateUtils.getTimeNow()));
         this.add(lblDateTouchOn);
         this.add(txtDateTouchOn);
         this.add(txtTimeTouchOn);
 
-        JLabel lblStationOn = new JLabel("Touch on station");
+        JLabel lblStationOn = new JLabel("Touch on station (Start typing to open auto completion)");
         this.add(lblStationOn);
 
         txtStationOn =  new JTextField(20);
@@ -53,9 +54,9 @@ public class TabTravel extends JPanel{
 
         JLabel lblDateTouchOff = new JLabel("Touch off time");
         txtDateTouchOff =  new JTextField(6);
-        txtDateTouchOff.setText(getDateFormat().format(getTimeNow()));
+        txtDateTouchOff.setText(DateUtils.getDateFormat().format(DateUtils.getTimeNow()));
         txtTimeTouchOff =  new JTextField(4);
-        txtTimeTouchOff.setText(getTimeFormat().format(getTimeNow()));
+        txtTimeTouchOff.setText(DateUtils.getTimeFormat().format(DateUtils.getTimeNow()));
         this.add(lblDateTouchOff);
         this.add(txtDateTouchOff);
         this.add(txtTimeTouchOff);
@@ -82,6 +83,21 @@ public class TabTravel extends JPanel{
         this.add(errTouchOff);
 
         JLabel lblTravelHistory = new JLabel("Travel History");
+        txtHistoryStartDate = new JTextField();
+        txtHistoryStartDate.setText(DateUtils.getDateFormat().format(DateUtils.getTimeNow()));
+        txtHistoryEndDate = new JTextField();
+        Calendar tomorrowDate = Calendar.getInstance();
+        tomorrowDate.add(Calendar.DATE, 1);
+        txtHistoryEndDate.setText(DateUtils.getDateFormat().format(tomorrowDate.getTime()));
+        this.add(txtHistoryStartDate);
+        this.add(txtHistoryEndDate);
+        JButton btnUpdateHistory = new JButton("Update");
+        btnUpdateHistory.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateData();
+            }
+        });
+        this.add(btnUpdateHistory);
         this.add(lblTravelHistory);
         lstTravelHistory = new JList();
         JScrollPane scrollPane = new JScrollPane(lstTravelHistory);
@@ -137,7 +153,13 @@ public class TabTravel extends JPanel{
         layout.putConstraint(SpringLayout.WIDTH, scrollPane, -(MARGIN_LEFT * 2), SpringLayout.WIDTH, this);
 
         layout.putConstraint(SpringLayout.WEST, lblTravelHistory, MARGIN_LEFT, SpringLayout.WEST, this);
-        layout.putConstraint(SpringLayout.SOUTH, lblTravelHistory, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, lblTravelHistory, -7, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, txtHistoryStartDate, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, txtHistoryEndDate, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.SOUTH, btnUpdateHistory, 0, SpringLayout.NORTH, scrollPane);
+        layout.putConstraint(SpringLayout.WEST, txtHistoryStartDate, MARGIN_LEFT, SpringLayout.EAST, lblTravelHistory);
+        layout.putConstraint(SpringLayout.WEST, txtHistoryEndDate, MARGIN_LEFT, SpringLayout.EAST, txtHistoryStartDate);
+        layout.putConstraint(SpringLayout.WEST, btnUpdateHistory, MARGIN_LEFT, SpringLayout.EAST, txtHistoryEndDate);
 
 
         // Set layout for error labels
@@ -158,7 +180,7 @@ public class TabTravel extends JPanel{
     private void touchOn(){
         if(checkTouchOnInput()){
             Station station = getStation(txtStationOn.getText());
-            Application.getInstance().getMykiCard().touchOn(getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText()), station);
+            Application.getInstance().getMykiCard().touchOn(DateUtils.getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText()), station);
             updateData();
         }
     }
@@ -166,7 +188,7 @@ public class TabTravel extends JPanel{
     private void touchOff(){
         if(checkTouchOffInput()){
             Station station = getStation(txtStationOff.getText());
-            Application.getInstance().getMykiCard().touchOff(getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText()), station);
+            Application.getInstance().getMykiCard().touchOff(DateUtils.getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText()), station);
             updateData();
         }
     }
@@ -181,7 +203,7 @@ public class TabTravel extends JPanel{
             isValid = false;
         }
 
-        Date touchOnTime = getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText());
+        Date touchOnTime = DateUtils.getTime(txtDateTouchOn.getText(), txtTimeTouchOn.getText());
         if(touchOnTime == null){
             errMessage += "Touch on date time is not valid <BR>";
             isValid = false;
@@ -202,7 +224,7 @@ public class TabTravel extends JPanel{
         boolean isValid = true;
         String errMessage = "";
 
-        Date touchOnTime = getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText());
+        Date touchOnTime = DateUtils.getTime(txtDateTouchOff.getText(), txtTimeTouchOff.getText());
         if(touchOnTime == null){
             errMessage += "Touch on date time is not valid <BR>";
             isValid = false;
@@ -228,37 +250,29 @@ public class TabTravel extends JPanel{
         errTouchOff.setText("");
     }
 
-    private Date getTime(String date, String time){
-        try{
-            String combinedDateTime = String.format("%s %s", date, time);
-            SimpleDateFormat formatter = new SimpleDateFormat(String.format("%s %s", DATE_FORMAT, TIME_FORMAT));
-
-            return formatter.parse(combinedDateTime);
-        }catch (Exception ex){
-            return null;
-        }
-    }
-
     public void updateData(){
         MykiCard mykiCard = Application.getInstance().getMykiCard();
         NumberFormat numberFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         java.util.List listData = new ArrayList<String>();
+
+        Date startDate = DateUtils.getDate(txtHistoryStartDate.getText());
+        Date endDate = DateUtils.getDate(txtHistoryEndDate.getText());
+
+        if(startDate == null || endDate == null){
+            lstTravelHistory.setListData(listData.toArray());
+            return;
+        }
+
         for(TravelLog log : mykiCard.getTravelLogs()){
-            listData.add(log.toString());
+            if(log.getTouchOffTime() != null){
+                if(log.getTouchOnTime().compareTo(startDate) >= 0 && endDate.compareTo(log.getTouchOffTime()) >= 0)
+                    listData.add(log.toString());
+            }else{
+                if(log.getTouchOnTime().compareTo(startDate) >= 0)
+                    listData.add(log.toString());
+            }
         }
         lstTravelHistory.setListData(listData.toArray());
-    }
-
-    private SimpleDateFormat getDateFormat(){
-        return new SimpleDateFormat(DATE_FORMAT);
-    }
-
-    private SimpleDateFormat getTimeFormat(){
-        return new SimpleDateFormat(TIME_FORMAT);
-    }
-
-    private Date getTimeNow(){
-        return Calendar.getInstance().getTime();
     }
 }

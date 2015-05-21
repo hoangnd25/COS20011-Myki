@@ -38,4 +38,9 @@ public class TrainLine {
     public List<Station> getStations() {
         return stations;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

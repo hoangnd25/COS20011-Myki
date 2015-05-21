@@ -31,7 +31,7 @@ public class Application {
     private JFrame createGUI(){
         JFrame frame = new JFrame("209522X - Hoang Nguyen");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(480, 640);
+        frame.setSize(900, 600);
 
         JTabbedPane tabbedPane = new JTabbedPane();
 
